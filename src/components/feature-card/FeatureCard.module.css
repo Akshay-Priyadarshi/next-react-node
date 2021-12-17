@@ -1,0 +1,10 @@
+.featureCard {
+	margin: auto;
+	padding: 10px;
+	width: 80%;
+	border-radius: 10px;
+	background-color: #09bc8a;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}

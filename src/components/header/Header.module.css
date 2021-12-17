@@ -1,0 +1,76 @@
+.header {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	background-color: aliceblue;
+	padding: 10px;
+}
+
+.navbar {
+	width: 40%;
+	display: flex;
+	justify-content: space-between;
+}
+
+.logo {
+	width: 2.5rem;
+}
+
+.navLinks {
+	padding: 0.6rem 0.8rem;
+	font-size: 1rem;
+	font-weight: 500;
+	color: #172a3a;
+	background-color: transparent;
+	outline: none;
+	border: none;
+	border-radius: 1rem;
+	cursor: pointer;
+}
+
+.currentNavLink {
+	padding: 0.6rem 0.8rem;
+	font-size: 1rem;
+	font-weight: 500;
+	background-color: #172a3a;
+	color: #74b3ce;
+	outline: none;
+	border: none;
+	border-radius: 1rem;
+	cursor: pointer;
+}
+
+.navLinks:hover {
+	transition: all 0.2s ease-out;
+	background-color: #172a3a;
+	color: #74b3ce;
+}
+
+/* Extra large devices (large laptops and desktops, 1200px and down) */
+@media only screen and (max-width: 1200px) {
+}
+/* Large devices (laptops/desktops, 992px and down) */
+@media only screen and (max-width: 992px) {
+}
+/* Medium devices (landscape tablets, 768px and down) */
+@media only screen and (max-width: 768px) {
+	.header {
+		justify-content: center;
+	}
+
+	.logo {
+		width: 5rem;
+	}
+
+	.navbar {
+		display: none;
+	}
+}
+/* Small devices (portrait tablets and large phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+}
+/* Small devices (small phones, 400px and down) */
+@media only screen and (max-width: 400px) {
+}

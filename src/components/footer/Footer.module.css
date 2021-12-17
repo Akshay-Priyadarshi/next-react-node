@@ -1,0 +1,14 @@
+.footer {
+	background-color: black;
+	color: whitesmoke;
+	width: 100vw;
+	height: 50px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.footerText {
+	font-size: 12px;
+	color: grey;
+}
