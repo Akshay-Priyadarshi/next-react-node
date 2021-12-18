@@ -8,7 +8,9 @@ import { ensureDatabaseConnection } from './server/utils/db.util'
 import { getEnv } from './server/utils/env.util'
 
 // Configuring environment variables
-dotenv.config()
+if (process.env.NODE_ENV === 'development') {
+	dotenv.config()
+}
 
 // Setting PORT constant
 const PORT = parseInt(getEnv('PORT') as string) || 8080
