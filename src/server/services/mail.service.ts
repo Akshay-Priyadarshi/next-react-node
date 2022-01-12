@@ -1,6 +1,4 @@
-import { readFileSync } from 'fs'
 import { JwtPayload, sign } from 'jsonwebtoken'
-import { getEmailTransporter, getMailOptions } from '../utils/email-sender.util'
 import { getEnv } from '../utils/env.util'
 import { UserService } from './user.service'
 import { CourierClient } from '@trycourier/courier'
