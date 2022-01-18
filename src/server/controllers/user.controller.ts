@@ -8,14 +8,10 @@ import { UserAuthLevel } from '../database/user.model'
 import { UserService } from '../services/user.service'
 import { AppResponse } from '../types/responses/app.response'
 import { AppSuccessResponse } from '../types/responses/success.response'
-import { MailService } from '../services/mail.service'
-import { getEnv } from '../utils/env.util'
-import { AppErrorResponse } from '../types/responses/error.response'
 
 export const UserController = Router()
 
 const userService = new UserService()
-const mailService = new MailService()
 
 UserController.get(
 	'/',
@@ -117,62 +113,6 @@ UserController.put(
 						}),
 					})
 				)
-			}
-		} catch (err) {
-			next(err)
-		}
-	}
-)
-
-UserController.get('/try-verify/:userId', async (req, res, next) => {
-	try {
-		const ifDev = getEnv('NODE_ENV') === 'development'
-		const verifyBaseUrl = `${ifDev ? 'http' : 'https'}://${req.hostname}${
-			ifDev ? `:${getEnv('PORT')}` : ''
-		}${req.baseUrl}`
-		const mailSent = await mailService.tryVerifyMail(
-			req.hostname,
-			req.params.userId,
-			verifyBaseUrl
-		)
-		if (mailSent) {
-			res.json(
-				new AppResponse({
-					reqPath: req.originalUrl,
-					success: new AppSuccessResponse({
-						message: 'verification email sent successfully',
-					}),
-				})
-			)
-		} else {
-			next(
-				new AppErrorResponse({ message: "couldn't send verification email" })
-			)
-		}
-	} catch (err) {
-		next(err)
-	}
-})
-
-UserController.get(
-	'/verify/:userId',
-	async (req: Request<any, any, any, { token: string }>, res, next) => {
-		try {
-			const verifyResult = await userService.verifyUser(
-				req.params.userId,
-				req.query.token
-			)
-			if (verifyResult) {
-				res.json(
-					new AppResponse({
-						reqPath: req.originalUrl,
-						success: new AppSuccessResponse({
-							message: 'user succcessfully verified',
-						}),
-					})
-				)
-			} else {
-				next(new AppErrorResponse({ message: "can't verify user" }))
 			}
 		} catch (err) {
 			next(err)
