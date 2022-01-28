@@ -6,6 +6,7 @@ import { ErrorMiddleware } from './server/middlewares/error.middleware'
 import { ensureDatabaseConnection } from './server/utils/db.util'
 import { getEnv } from './server/utils/env.util'
 import { RootRouter } from './server/routers/root.router'
+import { UtilityMiddleware } from './server/middlewares/utility.middleware'
 
 // Configuring environment variables
 if (process.env.NODE_ENV === 'development') {
@@ -24,7 +25,7 @@ nextApp.prepare().then(() => {
 	// Applying all middlewares
 	expressApp.use(express.json())
 	expressApp.use(express.urlencoded({ extended: true }))
-
+	expressApp.use(UtilityMiddleware)
 	// Authentication & Authorization middleware
 	expressApp.use(JwtMiddleware)
 

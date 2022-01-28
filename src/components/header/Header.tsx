@@ -9,7 +9,11 @@ const Header = () => {
 		<div className={styles.header}>
 			<Link href="/">
 				<a>
-					<img className={styles.logo} src="/logo.svg" alt="RelierX-logo" />
+					<img
+						className={styles.logo}
+						src="/assets/logo.svg"
+						alt="RelierX-logo"
+					/>
 				</a>
 			</Link>
 			<nav className={styles.navbar}>
