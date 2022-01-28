@@ -1,20 +1,14 @@
-import { NextFunction, Request, Response, Router } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { AuthService } from '../services/auth.service'
 import { AppResponse } from '../types/responses/app.response'
 import { AppSuccessResponse } from '../types/responses/success.response'
 
-export const AuthController = Router()
-const authService = new AuthService()
+export class AuthController {
+	constructor(private authService = new AuthService()) {}
 
-AuthController.get('/', (req, res) => {
-	res.send('Authentication')
-})
-
-AuthController.post(
-	'/login',
-	async (req: Request, res: Response, next: NextFunction) => {
+	login = async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const loginResponse = await authService.login(req.body)
+			const loginResponse = await this.authService.login(req.body)
 			const appResponse = new AppResponse({
 				reqPath: req.originalUrl,
 				success: new AppSuccessResponse({
@@ -27,13 +21,10 @@ AuthController.post(
 			next(err)
 		}
 	}
-)
 
-AuthController.post(
-	'/signup',
-	async (req: Request, res: Response, next: NextFunction) => {
+	signup = async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const signedupUser = await authService.signup(req.body)
+			const signedupUser = await this.authService.signup(req.body)
 			const appResponse = new AppResponse({
 				reqPath: req.originalUrl,
 				success: new AppSuccessResponse({
@@ -46,4 +37,4 @@ AuthController.post(
 			next(err)
 		}
 	}
-)
+}

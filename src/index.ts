@@ -1,11 +1,11 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import next from 'next'
-import { RootController } from './server/controllers/root.controller'
 import { JwtMiddleware } from './server/middlewares/jwt.middleware'
 import { ErrorMiddleware } from './server/middlewares/error.middleware'
 import { ensureDatabaseConnection } from './server/utils/db.util'
 import { getEnv } from './server/utils/env.util'
+import { RootRouter } from './server/routers/root.router'
 
 // Configuring environment variables
 if (process.env.NODE_ENV === 'development') {
@@ -29,7 +29,7 @@ nextApp.prepare().then(() => {
 	expressApp.use(JwtMiddleware)
 
 	// Connecting to root router
-	expressApp.use('/api', RootController)
+	expressApp.use('/api', RootRouter)
 	expressApp.all('*', (req, res) => handle(req, res))
 
 	// Error handler middleware

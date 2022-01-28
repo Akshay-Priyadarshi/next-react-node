@@ -1,23 +1,14 @@
-import { Router, Request, Response, NextFunction } from 'express'
-import {
-	AuthenticationMiddleware,
-	AuthorizationMiddleware,
-	SelfAuthorizationMiddleware,
-} from '../middlewares/auth.middleware'
-import { UserAuthLevel } from '../database/user.model'
+import { Request, Response, NextFunction } from 'express'
 import { UserService } from '../services/user.service'
 import { AppResponse } from '../types/responses/app.response'
 import { AppSuccessResponse } from '../types/responses/success.response'
 
-export const UserController = Router()
+export class UserController {
+	constructor(private userService = new UserService()) {}
 
-const userService = new UserService()
-
-UserController.get(
-	'/',
-	async (req: Request, res: Response, next: NextFunction) => {
+	getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const users = await userService.getAllUsers()
+			const users = await this.userService.getAllUsers()
 			const appResponse = new AppResponse({
 				reqPath: req.originalUrl,
 				success: new AppSuccessResponse({ data: users }),
@@ -27,16 +18,10 @@ UserController.get(
 			next(err)
 		}
 	}
-)
 
-UserController.get(
-	'/:userId',
-	AuthenticationMiddleware(),
-	AuthorizationMiddleware(UserAuthLevel.USER),
-	SelfAuthorizationMiddleware(),
-	async (req: Request, res: Response, next: NextFunction) => {
+	getUserById = async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const user = await userService.getUserById(req.params.userId)
+			const user = await this.userService.getUserById(req.params.userId)
 			const appResponse = new AppResponse({
 				reqPath: req.originalUrl,
 				success: new AppSuccessResponse({ data: user }),
@@ -46,15 +31,10 @@ UserController.get(
 			next(err)
 		}
 	}
-)
 
-UserController.put(
-	'/:userId',
-	AuthenticationMiddleware(),
-	AuthorizationMiddleware(UserAuthLevel.ADMIN),
-	async (req: Request, res: Response, next: NextFunction) => {
+	updateUser = async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const updatedUser = await userService.updateUser(
+			const updatedUser = await this.userService.updateUser(
 				req.params.userId,
 				req.body
 			)
@@ -70,15 +50,10 @@ UserController.put(
 			next(err)
 		}
 	}
-)
 
-UserController.delete(
-	'/:userId',
-	AuthenticationMiddleware(),
-	AuthorizationMiddleware(UserAuthLevel.ADMIN),
-	async (req: Request, res: Response, next: NextFunction) => {
+	deleteUser = async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const deletedUser = await userService.deleteUser(req.params.userId)
+			const deletedUser = await this.userService.deleteUser(req.params.userId)
 			const appResponse = new AppResponse({
 				reqPath: req.originalUrl,
 				success: new AppSuccessResponse({
@@ -91,16 +66,14 @@ UserController.delete(
 			next(err)
 		}
 	}
-)
 
-UserController.put(
-	'/reset-password/:userId',
-	AuthenticationMiddleware(),
-	AuthorizationMiddleware(UserAuthLevel.USER),
-	SelfAuthorizationMiddleware(),
-	async (req, res, next) => {
+	resetUserPassword = async (
+		req: Request,
+		res: Response,
+		next: NextFunction
+	) => {
 		try {
-			const resetResult = await userService.resetUserPassword(
+			const resetResult = await this.userService.resetUserPassword(
 				req.params.userId,
 				req.body
 			)
@@ -118,4 +91,4 @@ UserController.put(
 			next(err)
 		}
 	}
-)
+}
