@@ -6,10 +6,5 @@ declare global {
 		export interface Request {
 			user: UserDatabaseResponse | null | undefined
 		}
-
-		export interface Response {
-			sendPdf: function(Buffer): void
-			sendMail: function(MailDataRequired | MailDataRequired[]): void
-		}
 	}
 }

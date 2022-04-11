@@ -6,7 +6,6 @@ import { ErrorMiddleware } from './server/middlewares/error.middleware'
 import { ensureDatabaseConnection } from './server/utils/db.util'
 import { getEnv } from './server/utils/env.util'
 import { RootRouter } from './server/routers/root.router'
-import { UtilityMiddleware } from './server/middlewares/utility.middleware'
 
 // Configuring environment variables
 if (process.env.NODE_ENV === 'development') {
@@ -25,7 +24,6 @@ nextApp.prepare().then(() => {
 	// Applying all middlewares
 	expressApp.use(express.json())
 	expressApp.use(express.urlencoded({ extended: true }))
-	expressApp.use(UtilityMiddleware)
 	// Authentication & Authorization middleware
 	expressApp.use(JwtMiddleware)
 
@@ -37,9 +35,15 @@ nextApp.prepare().then(() => {
 	expressApp.use(ErrorMiddleware)
 
 	// Ensure database connection and start server
-	ensureDatabaseConnection().then(() => {
+	// Ensure database connection and start server
+	ensureDatabaseConnection()
+	.then(() => {
+		console.log('🚀 Database connection ensured')
+	})
+	.then(() => {
 		expressApp.listen(PORT, () => {
 			console.log(`🚀 Server listening at http://localhost:${PORT}/`)
 		})
 	})
+	.catch((err) => console.error(err))
 })

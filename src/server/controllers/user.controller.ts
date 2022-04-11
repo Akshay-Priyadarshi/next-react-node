@@ -1,14 +1,41 @@
 import { Request, Response, NextFunction } from 'express'
+import { StatusCodes } from 'http-status-codes'
+import { MailService } from '../services/mail.service'
 import { UserService } from '../services/user.service'
-import { AppResponse } from '../types/responses/app.response'
-import { AppSuccessResponse } from '../types/responses/success.response'
+import { AppResponse } from '../responses/app.response'
+import { AppErrorResponse } from '../responses/error.response'
+import { AppSuccessResponse } from '../responses/success.response'
+import { getUserVerifyRedirectUrl } from '../utils/url.util'
+import { ENV_VERIFY_USER_SECRET } from '../utils/constant.util'
+import { getSignedJwtToken } from '../utils/jwt.util'
+import { getPaginationDataFromQuery } from '../utils/transform.util'
 
 export class UserController {
-	constructor(private userService = new UserService()) {}
+	constructor(
+		private userService = new UserService(),
+		private mailService = new MailService()
+	) {}
+
+	getUserCount = async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const count = await this.userService.getUserCount()
+			const appResponse = new AppResponse({
+				reqPath: req.originalUrl,
+				success: new AppSuccessResponse({
+					data: count,
+				}),
+			})
+			res.json(appResponse)
+		} catch (err) {
+			next(err)
+		}
+	}
 
 	getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const users = await this.userService.getAllUsers()
+			const users = await this.userService.getAllUsers(
+				getPaginationDataFromQuery(req.query)
+			)
 			const appResponse = new AppResponse({
 				reqPath: req.originalUrl,
 				success: new AppSuccessResponse({ data: users }),
@@ -84,6 +111,60 @@ export class UserController {
 						success: new AppSuccessResponse({
 							message: 'new password successfully saved',
 						}),
+					})
+				)
+			}
+		} catch (err) {
+			next(err)
+		}
+	}
+
+	verifyUser = async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const payload = { sub: req.params.userId }
+			const signedVerifyToken = getSignedJwtToken(
+				payload,
+				ENV_VERIFY_USER_SECRET
+			)
+			await this.mailService.sendVerifyUserMail(
+				req.params.userId,
+				getUserVerifyRedirectUrl(req, signedVerifyToken)
+			)
+			const appResponse = new AppResponse({
+				reqPath: req.originalUrl,
+				success: new AppSuccessResponse({
+					message: 'verification mail sent successfully',
+				}),
+			})
+			res.json(appResponse)
+		} catch (err) {
+			next(err)
+		}
+	}
+
+	verifyUserRedirect = async (
+		req: Request,
+		res: Response,
+		next: NextFunction
+	) => {
+		try {
+			const ifVerified = await this.userService.verifyUserRedirect(
+				req.params.verifyToken
+			)
+			if (ifVerified && ifVerified == true) {
+				res.json(
+					new AppResponse({
+						reqPath: req.originalUrl,
+						success: new AppSuccessResponse({
+							message: `user successfully verified`,
+						}),
+					})
+				)
+			} else {
+				next(
+					new AppErrorResponse({
+						message: `can't verify email`,
+						statusCode: StatusCodes.BAD_REQUEST,
 					})
 				)
 			}

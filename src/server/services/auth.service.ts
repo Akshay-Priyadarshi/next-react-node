@@ -1,8 +1,8 @@
-import { sign } from 'jsonwebtoken'
-import { ILoginCredentialsDto, ILoginResponseDto } from '../types/dtos/auth.dto'
-import { CreateUserDto, UserDatabaseResponse } from '../types/dtos/user.dto'
-import { AuthenticationError } from '../types/responses/error.response'
-import { getEnv } from '../utils/env.util'
+import { ILoginCredentialsDto, ILoginResponseDto } from '../dtos/auth.dto'
+import { CreateUserDto, UserDatabaseResponse } from '../dtos/user.dto'
+import { AuthenticationError } from '../responses/error.response'
+import { ENV_ACCESS_TOKEN_SECRET } from '../utils/constant.util'
+import { getSignedJwtToken } from '../utils/jwt.util'
 import { verifyPassword } from '../utils/password.util'
 import { UserService } from './user.service'
 
@@ -20,14 +20,15 @@ export class AuthService {
 	async login(
 		loginCredentials: ILoginCredentialsDto
 	): Promise<ILoginResponseDto | undefined> {
-		const user = await this.userService.getUserLoginCredentials(
+		const user = await this.userService.getCompleteUserByEmail(
 			loginCredentials.email
 		)
 		if (user) {
 			if (verifyPassword(loginCredentials.password, user.password)) {
-				const signedAuthToken = sign(
-					{ sub: user.id },
-					getEnv('JWT_SECRET') as string
+				const payload = { sub: user.id }
+				const signedAuthToken = getSignedJwtToken(
+					payload,
+					ENV_ACCESS_TOKEN_SECRET
 				)
 				const signedBearerAuthToken = `Bearer ${signedAuthToken}`
 				const loginResponse: ILoginResponseDto = {

@@ -1,24 +1,30 @@
-import { model, Schema } from 'mongoose'
+import { Model, model, Schema } from 'mongoose'
+import { USER_MODEL_NAME } from '../utils/constant.util'
 import { encryptPassword } from '../utils/password.util'
 import { IProfile, profileSchema } from './profile.schema'
 
-export enum UserAuthLevel {
-	USER = 1,
-	ADMIN = 0,
+export enum UserRole {
+	ADMIN = 'ADMIN',
+	USER = 'USER',
 }
 
 export interface IUser {
 	email: string
 	password: string
-	authLevel: number
+	role: UserRole
 	verified: boolean
 	profile: IProfile
 }
+
+export interface UserQueryHelpers {}
+
+export interface IUserModel extends Model<IUser, UserQueryHelpers> {}
 
 const userSchema = new Schema<IUser>(
 	{
 		email: {
 			type: String,
+			select: true,
 			required: [true, 'email is required'],
 			unique: true,
 			index: true,
@@ -26,20 +32,20 @@ const userSchema = new Schema<IUser>(
 		},
 		password: {
 			type: String,
-			set: encryptPassword,
 			select: false,
+			set: encryptPassword,
 			required: [true, 'password is required'],
 		},
-		authLevel: {
-			type: Number,
-			enum: UserAuthLevel,
-			select: false,
-			default: UserAuthLevel.USER,
+		role: {
+			type: String,
+			select: true,
+			enum: UserRole,
+			default: UserRole.USER,
 		},
-		verified: { type: Boolean, default: false, select: false },
-		profile: profileSchema,
+		verified: { type: Boolean, default: false, select: true },
+		profile: { type: profileSchema, select: true },
 	},
 	{ timestamps: true }
 )
 
-export const User = model<IUser>('User', userSchema)
+export const User = model<IUser, IUserModel>(USER_MODEL_NAME, userSchema)
